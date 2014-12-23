@@ -57,4 +57,59 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+
+
+
+var http = require('http');
+var AisDecoder = require ('aisdecoder').AisDecoder;
+var decoder = new AisDecoder;
+//var aisobject = decoder.decode('!AIVDM,1,1,,B,177KQJ5000G?tO`K>RA1wUbN0TKH,0*5C');
+
+
+var server = http.createServer(app); //.listen(3000);
+var io = require('socket.io').listen(server);
+
+var ships = {};
+
+io.set('log level', 2);
+io.sockets.on('connection', function (socket) {
+
+    socket.on('disconnect', function () {
+        io.sockets.emit('user disconnected');
+    });
+});
+
+//SERIAL PORT
+
+
+var serialport = require("serialport");
+var SerialPort = serialport.SerialPort; // localize object constructor
+
+var sp = new SerialPort("/dev/tty.Repleo-PL2303-000013FD", {
+    parser: serialport.parsers.readline("\n"),
+    baudrate: 38400
+    //parser: serialport.parsers.raw
+});
+
+
+sp.on('open', function(){
+    console.log('Serial Port Opened');
+    sp.on('data', function(data){
+        var d = decode(data);
+        console.log(d);
+
+
+        if(d.mmsi){
+            ships[d.mmsi] = d;
+            io.sockets.emit('ais', d);
+        }
+    });
+});
+
+
+function decode(args){
+    return decoder.decode(args) || {};
+}
+
+
+module.exports = server;
