@@ -74,4 +74,37 @@ block content
       console.log(arguments)
     });
 
+    function getPins(e) {
+      bounds = map.getBounds();
+      //url = "parks/within?lat1=" + bounds.getSouthWest().lat + "&lon1=" + bounds.getSouthWest().lng + "&lat2=" + bounds.getNorthEast().lat + "&lon2=" + bounds.getNorthEast().lng;
+      var url = "users";
+      $.get(url, pinTheMap, "json")
+    }
+    function pinTheMap(data) {
+      //clear the current pins
+      //map.removeLayer(markerLayerGroup);
+      //add the new pins
+      //console.log('data:   ' + JSON.stringify(data));
+      var markerArray = [];
+      for (var i = 0; i < data.length; i++) {
+        console.log('data.length: ' + data.length);
+        var park = data[i];
+        console.log('park ' + JSON.stringify(park));
+        //markerArray.push(L.mapbox.marker([park.lat, park.lon])); //.bindPopup(park.name);
+        var m = L.marker([park.lat, park.lon], {
+            icon: L.mapbox.marker.icon({
+              'marker-color': '#ff0000'
+          })
+        });
+       // m.addTo(map);
+        markerArray.push(m);
+      }
+      var markerLayerGroup = L.layerGroup(markerArray).addTo(map);
+    }
+    //map.on('dragend', getPins);
+    //map.on('zoomend', getPins);
+
+    //var markerLayerGroup = L.layerGroup().addTo(map);
+    map.whenReady(getPins)
+
 

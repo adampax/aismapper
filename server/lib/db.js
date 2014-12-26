@@ -16,3 +16,14 @@ exports.init = function(){
     });
 
 }
+
+exports.getStations = function(req, res){
+    pg('SELECT name, ST_X(ST_Transform(geom, 4326)) as lon, ST_Y(ST_Transform(geom, 4326)) as lat FROM nyc_subway_stations;', function(err, rows, result) {
+        if(err) {
+            res.send(500, {http_status:500,error_msg: err})
+            return console.error('error running query', err);
+        }
+        res.send(rows);
+        return rows;
+    });
+}
