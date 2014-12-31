@@ -99,9 +99,12 @@ sp.on('open', function(){
         console.log(d);
 
 
-        if(d.mmsi){
+        if(d.mmsi && (d.lat >= -90 && d.lat <= 90 ) && (d.lon >= -180 && d.lon <=180)){
             ships[d.mmsi] = d;
             io.sockets.emit('ais', d);
+            db.insertPin(d);
+        } else {
+            console.log('invalid mmsi or coordinates. Skipping');
         }
     });
 });
