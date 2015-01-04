@@ -102,7 +102,7 @@ sp.on('open', function(){
         if(d.mmsi && (d.lat >= -90 && d.lat <= 90 ) && (d.lon >= -180 && d.lon <=180)){
             ships[d.mmsi] = d;
             io.sockets.emit('ais', d);
-            db.insertPin(d);
+            db.insertPoint(d);
         } else {
             console.log('invalid mmsi or coordinates. Skipping');
         }
@@ -113,6 +113,9 @@ sp.on('open', function(){
 function decode(args){
     return decoder.decode(args) || {};
 }
+
+var db = require('./lib/db');
+db.init();
 
 
 module.exports = server;
