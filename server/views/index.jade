@@ -2,9 +2,8 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p AIS Mapper
   div#map
-  ui#messages
 
   script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js')
   script(src='/socket.io/socket.io.js')
@@ -12,26 +11,18 @@ block content
   script(src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js')
   link(rel='stylesheet' href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css')
   script.
-    L.mapbox.accessToken = 'pk.eyJ1IjoicG9sYW5jb21lZGlhIiwiYSI6InNwcjNCTW8ifQ.OXPbAKGYlfm0kvgw1GU39Q';
-    var map = L.mapbox.map('map', 'polancomedia.h9hhlbnl')
-            .setView([26.030503, -80.136846], 13);
+    L.mapbox.accessToken = '#{mapboxAccessToken}';
+    var map = L.mapbox.map('map', '#{mapboxMapId}')
+            .setView([26.05, -80.136846], 13);
 
     //track our data by mmsi as array index
     var d = [];
 
-
     var socket = io.connect('//localhost:3000');
-    socket.on('welcome', function (data) {
-    //  $('#messages').append('<li>' + data.message + '</li>');
-      socket.emit('i am client', {data: 'foo!'});
-    });
-    socket.on('time', function (data) {
-      console.log(data);
-      $('#messages').append('<li>' + data.time + '</li>');
-    });
+
+    //Using a socket for live updates to the map
     socket.on('ais', function (data) {
-      console.log('hello ' + data.mmsi);
-      //$('#messages').append('<li> ' + data.mmsi + '</li>');
+
 
       if(data.lat && data.lon) {
         if (d[data.mmsi]) {
@@ -65,46 +56,28 @@ block content
           d[data.mmsi].marker.addTo(map);
         }
       }
-
-    });
-    socket.on('error', function () {
-      console.error(arguments)
-    });
-    socket.on('message', function () {
-      console.log(arguments)
     });
 
-    function getPins(e) {
-      bounds = map.getBounds();
-      //url = "parks/within?lat1=" + bounds.getSouthWest().lat + "&lon1=" + bounds.getSouthWest().lng + "&lat2=" + bounds.getNorthEast().lat + "&lon2=" + bounds.getNorthEast().lng;
-      var url = "users";
-      $.get(url, pinTheMap, "json")
+
+    //when the map is first loaded, we will add historical route data from postgis
+    function getRoutes(){
+
+      $.get('users', addRoutes, "json");
+
     }
-    function pinTheMap(data) {
-      //clear the current pins
-      //map.removeLayer(markerLayerGroup);
-      //add the new pins
-      //console.log('data:   ' + JSON.stringify(data));
-      var markerArray = [];
-      for (var i = 0; i < data.length; i++) {
-        console.log('data.length: ' + data.length);
-        var park = data[i];
-        console.log('park ' + JSON.stringify(park));
-        //markerArray.push(L.mapbox.marker([park.lat, park.lon])); //.bindPopup(park.name);
-        var m = L.marker([park.lat, park.lon], {
-            icon: L.mapbox.marker.icon({
-              'marker-color': '#ff0000'
-          })
-        });
-       // m.addTo(map);
-        markerArray.push(m);
+
+    //pass geojson to the map to load the historical data
+    function addRoutes(geojson){
+
+      var geo = {
+        "type": "FeatureCollection",
+        "features": geojson
+      };
+
+      L.geoJson(geo, {style: function(feature){
+        return {'color': '#ff0000',
+      'stroke-width': 10
       }
-      var markerLayerGroup = L.layerGroup(markerArray).addTo(map);
+      }}).addTo(map);
     }
-    //map.on('dragend', getPins);
-    //map.on('zoomend', getPins);
-
-    //var markerLayerGroup = L.layerGroup().addTo(map);
-    map.whenReady(getPins)
-
-
+    map.whenReady(getRoutes);

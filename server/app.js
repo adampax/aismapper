@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var config = require('./config');
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -85,7 +87,7 @@ io.sockets.on('connection', function (socket) {
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort; // localize object constructor
 
-var sp = new SerialPort("/dev/tty.Repleo-PL2303-000013FD", {
+var sp = new SerialPort(config.serialPort, {
     parser: serialport.parsers.readline("\n"),
     baudrate: 38400
     //parser: serialport.parsers.raw
