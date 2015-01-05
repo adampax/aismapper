@@ -67,7 +67,6 @@ exports.insertPoint = function(args){
 };
 
 exports.getRoutes = function(req, res){
-    //var query = "SELECT ST_AsGeoJSON(the_points)::json geometry FROM (SELECT ST_MakeLine(geom) AS the_points FROM " + tableName + " GROUP BY mmsi) AS the_points limit 1;";
     var query = "SELECT 'Feature' as type, ST_AsGeoJSON(the_points)::json geometry, '{}' as properties FROM (SELECT ST_MakeLine(geom) AS the_points FROM " + tableName + " GROUP BY mmsi) AS the_points;";
 
     pg(query, function(err, rows, result){

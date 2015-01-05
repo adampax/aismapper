@@ -59,14 +59,9 @@ app.use(function(err, req, res, next) {
 });
 
 
-
-
-
 var http = require('http');
 var AisDecoder = require ('aisdecoder').AisDecoder;
 var decoder = new AisDecoder;
-//var aisobject = decoder.decode('!AIVDM,1,1,,B,177KQJ5000G?tO`K>RA1wUbN0TKH,0*5C');
-
 
 var server = http.createServer(app); //.listen(3000);
 var io = require('socket.io').listen(server);
@@ -82,8 +77,6 @@ io.sockets.on('connection', function (socket) {
 });
 
 //SERIAL PORT
-
-
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort; // localize object constructor
 
@@ -100,7 +93,7 @@ sp.on('open', function(){
         var d = decode(data);
         console.log(d);
 
-
+        //check to see if mmsi exists, and if coordinates are valid
         if(d.mmsi && (d.lat >= -90 && d.lat <= 90 ) && (d.lon >= -180 && d.lon <=180)){
             ships[d.mmsi] = d;
             io.sockets.emit('ais', d);
