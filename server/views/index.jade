@@ -74,10 +74,6 @@ block content
         "features": geojson
       };
 
-      L.geoJson(geo, {style: function(feature){
-        return {'color': '#ff0000',
-      'stroke-width': 10
-      }
-      }}).addTo(map);
+      L.geoJson(geo, {style: L.mapbox.simplestyle.style }).addTo(map);
     }
     map.whenReady(getRoutes);

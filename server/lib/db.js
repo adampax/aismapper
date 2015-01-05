@@ -67,7 +67,29 @@ exports.insertPoint = function(args){
 };
 
 exports.getRoutes = function(req, res){
-    var query = "SELECT 'Feature' as type, ST_AsGeoJSON(the_points)::json geometry, '{}' as properties FROM (SELECT ST_MakeLine(geom) AS the_points FROM " + tableName + " GROUP BY mmsi) AS the_points;";
+    var properties = {
+        'stroke': '#000000',
+        'stroke-width': 1,
+        'stroke-opacity':0.2
+    };
+
+    var query = "SELECT 'Feature' as type, ST_AsGeoJSON(the_points)::json geometry, '" + JSON.stringify(properties) + "'::json as properties FROM (SELECT ST_MakeLine(geom) AS the_points FROM " + tableName + " GROUP BY mmsi) AS the_points;";
+    pg(query, function(err, rows, result){
+        if(err){
+            return console.error(err);
+        }
+       // console.log(JSON.stringify(result));
+        res.send(rows);
+    })
+}
+
+exports.getPoints = function(req, res){
+    var properties = {
+        'stroke': '#00ff00',
+        'stroke-width': 10,
+        'stroke-opacity':1
+    }
+    var query = "SELECT 'Feature' as type, ST_AsGeoJSON(geom)::json geometry, '" + JSON.stringify(properties) + "'::json as properties FROM " + tableName + " ORDER BY create_timestamp LIMIT 1000;";
 
     pg(query, function(err, rows, result){
         if(err){
