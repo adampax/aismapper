@@ -5,6 +5,7 @@ var db = require('../lib/db');
 /* GET users listing. */
 router.get('/', function(req, res) {
   db.getRoutes(req, res);
+  //db.getPoints(req, res);
 });
 
 module.exports = router;
