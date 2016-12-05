@@ -8,7 +8,7 @@ var error_response = "data already exists - bypassing db initialization step\n";
 
 exports.init = function(){
 
-    pg('CREATE EXTENSION postgis;', createDBSchema);
+    pg('CREATE EXTENSION IF NOT EXISTS postgis;', createDBSchema);
     //promise.then(createDBSchema);
     //promise.then(addSpatialIndex);
 };
@@ -32,7 +32,7 @@ function addSpatialIndex(err, rows, result) {
         return console.error(error_response, err);
     }
     console.log('result', result);
-    pg("CREATE INDEX "+tableName+"_geom_gist ON "+tableName+" USING gist (geom);", function(err, rows, result) {
+    pg("CREATE INDEX IF NOT EXISTS "+tableName+"_geom_gist ON "+tableName+" USING gist (geom);", function(err, rows, result) {
         if(err){
             console.log('addSpatial err', err);
         } else {
