@@ -60,11 +60,10 @@ app.use(function(err, req, res, next) {
 
 
 var http = require('http');
-var AisDecoder = require ('aisdecoder').AisDecoder;
-var decoder = new AisDecoder;
 
 var server = http.createServer(app); //.listen(3000);
 var io = require('socket.io').listen(server);
+var AisDecode  = require ("./lib/GG-AisDecode");
 
 var ships = {};
 
@@ -88,8 +87,11 @@ var sp = new SerialPort(config.serialPort, {
 sp.on('open', function(){
     console.log('Serial Port Opened');
     sp.on('data', function(data){
-        var d = decode(data);
-        console.log(d);
+
+        //set up decoder
+        var sess = {};
+        var d = new AisDecode(data, sess);
+        console.log(JSON.stringify(d));
 
         //check to see if mmsi exists, and if coordinates are valid
         if(d.mmsi && (d.lat >= -90 && d.lat <= 90 ) && (d.lon >= -180 && d.lon <=180)){
@@ -100,12 +102,9 @@ sp.on('open', function(){
             console.log('invalid mmsi or coordinates. Skipping');
         }
     });
+
+
 });
-
-
-function decode(args){
-    return decoder.decode(args) || {};
-}
 
 var db = require('./lib/db');
 db.init();

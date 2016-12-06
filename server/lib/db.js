@@ -53,7 +53,7 @@ exports.getStations = function(req, res){
 };
 
 exports.insertPoint = function(args){
-    var query = "Insert into "+tableName+" (type, mmsi, geom, create_timestamp) VALUES ('" + args.type + "', " + args.mmsi + ", ST_GeomFromText('POINT(" + args.lon + " " + args.lat + " )', 4326), '" + new Date().toISOString() + "');";
+    var query = "Insert into "+tableName+" (type, mmsi, geom, create_timestamp) VALUES ('" + args.aistype + "', " + args.mmsi + ", ST_GeomFromText('POINT(" + args.lon + " " + args.lat + " )', 4326), '" + new Date().toISOString() + "');";
     //var qpoints = points.map(insertMapPinSQL).join(",");
     //var query = insert + qpoints + ';';
     console.log(query);

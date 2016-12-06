@@ -14,7 +14,6 @@
     "debug": "~2.0.0",
     "jade": "~1.6.0",
     "socket.io": "~0.9.0",
-    "aisdecoder": "~0.0.0",
     "pg": "~4.1.1",
     "pg-query": "~0.10.0"
     "serialport": "~4.0.6",
