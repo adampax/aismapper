@@ -77,13 +77,11 @@ io.sockets.on('connection', function (socket) {
 });
 
 //SERIAL PORT
-var serialport = require("serialport");
-var SerialPort = serialport.SerialPort; // localize object constructor
+var SerialPort = require("serialport");
 
 var sp = new SerialPort(config.serialPort, {
-    parser: serialport.parsers.readline("\n"),
+    parser: SerialPort.parsers.readline("\n"),
     baudrate: 38400
-    //parser: serialport.parsers.raw
 });
 
 
